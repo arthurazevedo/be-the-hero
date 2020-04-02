@@ -7,18 +7,16 @@ module.exports = {
 
     return res.json(ongs)
   },
+
   async create (req, res) {
     const { name, email, whatsapp, city, uf } = req.body
 
-    const ong = await connection('ongs').where('email', email). select('email')
-    console.log(ong)
-
-    if ((ong.length > 0) || (name==='' || email === '' || whatsapp === '')){
+    if ((name==='' || email === '' || whatsapp === '')){
       return res.status(422).json({message: 'Error'})
     }
 
     const id = crypto.randomBytes(4).toString('HEX')
-
+    try{
     await connection('ongs').insert({
       id,
       name,
@@ -27,6 +25,9 @@ module.exports = {
       city,
       uf
     })
+  } catch(err) {
+    return res.json({message: err})
+  }
     return res.json({ id })
   }
 
